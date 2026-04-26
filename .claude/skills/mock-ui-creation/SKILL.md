@@ -207,17 +207,16 @@ When installing shadcn/ui components, they will automatically inherit the theme 
 - **Import mock data** from `src/mocks/data.ts` and render it on every screen
 - Show realistic data volumes (e.g., 15–50 items in a list, not 1–2)
 
-### Mock Auth Flow (Required)
+### Mock Login Flow (Required)
 
-- Implement a **working login flow**, not a static login screen.
-- Add auth state (context/store) with `isAuthenticated`, `user`, `login()`, `logout()`.
-- Use **route guards** for protected routes:
-  - Unauthenticated users are redirected to `/login`.
-  - Authenticated users visiting `/login` are redirected to the main app route.
-- **Do not implement real authentication** (no real OAuth/OIDC/SAML provider setup, no real backend auth calls, no token exchange).
-- Simulate login API behavior with the same 200–500ms delay pattern, then resolve from mock identity data.
-- Persist session state in `localStorage` so refresh keeps the signed-in state during demos.
-- Include at least one role-aware behavior in UI (e.g., action hidden/disabled by role).
+- Implement a **login screen that sets the active role and redirects to the app** — nothing more.
+- Store `user` (name, role, scope) in React context so all screens can display it.
+- **No route guards, no blocked pages.** Every route is freely accessible. The login screen is just a starting point for demos.
+- Visiting `/login` while a role is already selected may redirect to `/dashboard`, but navigating directly to any route (e.g. `/sites`) always works.
+- **Do not implement real authentication** (no OAuth/OIDC/SAML, no token exchange, no backend calls).
+- Simulate a brief login delay (200–500 ms) so the button press feels real, then resolve from mock identity data.
+- Persist the selected role in `localStorage` so page refresh keeps the demo running without re-login.
+- Include at least one role-aware behavior in UI (e.g., an action disabled or hidden based on `user.role`).
 
 ### Mock Data Generation (src/mocks/data.ts)
 
@@ -291,33 +290,27 @@ import SitesPage from "./pages/SitesPage";
 import { useAuth } from "./auth/useAuth";
 import AppLayout from "./layouts/AppLayout";
 
-function ProtectedRoute({ children }: { children: JSX.Element }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-}
-
-function LoginRoute() {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />;
-}
-
+// No route guards — all pages are freely accessible.
+// Login is only a role-selector that redirects to /dashboard.
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<LoginRoute />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route
           path="/*"
           element={
-            <ProtectedRoute>
-              <AppLayout>
-                <Routes>
-                  <Route path="/dashboard" element={<DashboardPage />} />
-                  <Route path="/sites" element={<SitesPage />} />
-                  {/* Add other routes here */}
-                </Routes>
-              </AppLayout>
-            </ProtectedRoute>
+            <AppLayout>
+              <Routes>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/sites" element={<SitesPage />} />
+                {/* Add other routes here */}
+                <Route
+                  path="*"
+                  element={<Navigate to="/dashboard" replace />}
+                />
+              </Routes>
+            </AppLayout>
           }
         />
       </Routes>
@@ -529,7 +522,7 @@ Tell the user:
 - ✅ **Use shadcn/ui components only** — don't build custom components
 - ✅ **Style with Tailwind 4 only** — no inline CSS or custom styles
 - ✅ **Use React Router for navigation** — product-like navigation by default; sidebar only if explicitly requested
-- ✅ **Mock auth flow must work** — auth state, guarded routes, redirect logic, session persistence, and no real provider integration
+- ✅ **Login is a role-selector, not a gate** — selecting a role persists to localStorage and redirects to the app; no page blocking, no route guards; every URL is always accessible
 - ✅ **Include dedicated `/sites` page** — product-like site map and navigation entry must exist
 - ✅ **Include feature/AC mapping in SCREENS.md** — align demo talking points with requirements
 - ✅ **Production-ready appearance** — every screen should impress customers
