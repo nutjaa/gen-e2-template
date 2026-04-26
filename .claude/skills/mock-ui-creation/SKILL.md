@@ -1,21 +1,22 @@
 ---
 name: mock-ui-creation
-description: "Generate a runnable mock UI from customer requirements or user stories. Creates a Vite + React + Tailwind 4 + shadcn + React Router app at apps/mock-ui/ on port 5678."
+description: "Generate a fully functional product demo with realistic mock data. Creates a Vite + React + Tailwind 4 + shadcn + React Router app at apps/mock-ui/ on port 5678 that looks and feels like the real product."
 ---
 
-You are an experienced UI/UX designer and React developer creating interactive mock UIs for customer validation and handoff.
+You are an experienced UI/UX designer and React developer creating interactive product demos with realistic mock data for customer presentations and live demonstrations.
 
-# Mock UI Generation Prompt
+# Product Demo Generation Prompt
 
 ## Your inputs
 
 Attach one of the following before running:
 
 - A user story file from `docs/features/user-stories/` (e.g. `story-001-feature-name.md`)
-- Customer requirements or design brief (paste or attach)
-- Feature specification with wireframes or screen descriptions
+- Customer requirements or feature specification (paste or attach)
+- Product specification with data models and business context
+- PRD file for domain understanding and demo scenarios
 
-If no context is provided, ask the user to attach a story or requirements before continuing.
+If no context is provided, ask the user to attach a story or PRD before continuing.
 
 ---
 
@@ -23,15 +24,13 @@ If no context is provided, ask the user to attach a story or requirements before
 
 Ask the user both questions at once:
 
-> **1. Should we generate a SCREENS.md mapping file?**  
-> (This maps each screen to Acceptance Criteria for later validation. Default: yes)
+> **1. What is the primary brand color for this demo?**  
+> (E.g. `#0066CC`, `#FF6B35`, `emerald`, or describe: "brand purple", "dark green")
 >
-> **2. What is the primary brand color for this UI?**  
-> (e.g. `#0066CC`, `blue`, `#FF6B35`, or describe: "brand purple", "dark green")
-> 
-> Optional: Also specify secondary color, accent color, or "dark mode preferred" if desired.
+> **2. Any specific demo scenarios or customer talking points you want to highlight?**  
+> (Optional: Also specify secondary color, accent color, or "dark mode preferred")
 >
-> The screens will be auto-detected from the attached user story or requirements context.
+> _Note: Screens, data models, and metrics will be automatically extracted from your attached user story or PRD._
 
 Wait for answers before generating.
 
@@ -39,14 +38,34 @@ Wait for answers before generating.
 
 ## Task
 
-Analyze the provided user story or requirements to extract all screens/pages needed. Then generate a fully functional Vite + React + Tailwind 4 + shadcn + React Router UI mock app that runs immediately.
+Analyze the provided user story, PRD, or requirements to extract all screens/pages and data models. Then generate a fully functional Vite + React + Tailwind 4 + shadcn + React Router product demo that runs immediately with **realistic mock data populated throughout**.
+
+**Automatic extraction from attached context:**
+
+- ✅ Identify all data models from the PRD or story (customers, orders, transactions, products, etc.)
+- ✅ Extract screen names from feature specs and acceptance criteria
+- ✅ Infer metrics and KPIs based on domain (e.g., financial app → show revenue, transaction volume, etc.)
+- ✅ Generate realistic sample data that demonstrates the product's value
 
 **Screen detection:**
-- Read acceptance criteria to identify user-facing screens/pages
-- Extract screen names from AC descriptions (e.g. AC-001 mentions "login page" → create LoginPage)
-- If unclear, infer from feature context
 
----
+- Read acceptance criteria and feature specs to identify user-facing screens/pages
+- Extract screen names from descriptions (e.g. AC mentions "dashboard with data table" → create DataDashboard)
+- If unclear, infer from feature context and product flow
+
+**Mock data generation:**
+
+- Generate realistic sample data that shows the product in action (not empty states)
+- Create 10–50+ sample records per entity type so tables/lists look real
+- Use contextually correct values for your domain (realistic amounts, dates, statuses)
+- Store all mock data in `src/mocks/data.ts` for easy reuse and customization
+
+**Customer-ready content language:**
+
+- Use **real, business-ready UI copy** suitable for customer sign-off.
+- Do not use placeholder or fake-looking labels such as: "Lorem ipsum", "Item 1", "Sample", "Demo User", "Test Data", or similar filler text.
+- Use domain-accurate screen titles, button labels, helper text, alerts, and table headings.
+- Keep wording concise, specific, and presentation-ready.
 
 ## Output — Project Initialization
 
@@ -89,10 +108,15 @@ apps/mock-ui/
 │   │   └── [shadcn components used]
 │   ├── lib/
 │   │   └── utils.ts (shadcn utility)
-│   └── types/
-│       └── index.ts (TypeScript interfaces)
+│   ├── types/
+│   │   └── index.ts (TypeScript interfaces for data models)
+│   ├── mocks/
+│   │   └── data.ts (realistic mock data generator)
+│   └── hooks/
+│       └── useData.ts (optional: hook for loading/filtering mock data)
 ├── public/
-└── README.md (how to run, port info)
+├── SCREENS.md (screen-to-AC mapping and demo scenarios)
+└── README.md (how to run, port info, demo focus)
 ```
 
 ---
@@ -104,15 +128,15 @@ apps/mock-ui/
 Update `vite.config.ts` to set port 5678:
 
 ```typescript
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 5678,
   },
-})
+});
 ```
 
 ### Package.json
@@ -135,27 +159,24 @@ export default defineConfig({
 Create or update `tailwind.config.ts` with the user-provided brand colors:
 
 ```typescript
-import type { Config } from 'tailwindcss'
+import type { Config } from "tailwindcss";
 
 export default {
-  content: [
-    './index.html',
-    './src/**/*.{js,ts,jsx,tsx}',
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',  // Replace with user's primary color
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c3d66',
+          50: "#f0f9ff",
+          100: "#e0f2fe",
+          200: "#bae6fd",
+          300: "#7dd3fc",
+          400: "#38bdf8",
+          500: "#0ea5e9", // Replace with user's primary color
+          600: "#0284c7",
+          700: "#0369a1",
+          800: "#075985",
+          900: "#0c3d66",
         },
         secondary: {
           // Secondary color palette (if user provided one)
@@ -167,7 +188,7 @@ export default {
     },
   },
   plugins: [],
-} satisfies Config
+} satisfies Config;
 ```
 
 **Note:** Replace the primary color values with the user's chosen color. If user provided hex (e.g. `#0066CC`), generate a full color palette using that as the 500 shade. Use online color palette generators if needed.
@@ -179,50 +200,127 @@ When installing shadcn/ui components, they will automatically inherit the theme 
 ### Pages and Components
 
 - **One file per screen** under `src/pages/`
-- Use **shadcn/ui components** (Button, Card, Input, Select, Dialog, etc.) via import
+- Include a dedicated `SitesPage.tsx` and route path `/sites` for site inventory and health overview.
+- Use **shadcn/ui components** (Button, Card, Input, Select, Dialog, Table, etc.) via import
 - Style with **Tailwind classes** only — no inline CSS
 - Export each as a React component: `export default function LoginPage() { ... }`
+- **Import mock data** from `src/mocks/data.ts` and render it on every screen
+- Show realistic data volumes (e.g., 15–50 items in a list, not 1–2)
+
+### Mock Auth Flow (Required)
+
+- Implement a **working login flow**, not a static login screen.
+- Add auth state (context/store) with `isAuthenticated`, `user`, `login()`, `logout()`.
+- Use **route guards** for protected routes:
+  - Unauthenticated users are redirected to `/login`.
+  - Authenticated users visiting `/login` are redirected to the main app route.
+- **Do not implement real authentication** (no real OAuth/OIDC/SAML provider setup, no real backend auth calls, no token exchange).
+- Simulate login API behavior with the same 200–500ms delay pattern, then resolve from mock identity data.
+- Persist session state in `localStorage` so refresh keeps the signed-in state during demos.
+- Include at least one role-aware behavior in UI (e.g., action hidden/disabled by role).
+
+### Mock Data Generation (src/mocks/data.ts)
+
+Create a **data generator** that produces realistic sample data matching your product domain:
+
+```typescript
+// src/mocks/data.ts
+export interface Product {
+  id: string;
+  name: string;
+  status: "active" | "inactive" | "pending";
+  createdAt: string;
+  value: number;
+  metadata: Record<string, any>;
+}
+
+export interface DashboardMetrics {
+  totalCount: number;
+  activeCount: number;
+  completionRate: number;
+  alertCount: number;
+}
+
+// Mock data functions
+export const generateMockItems = (count: number): Product[] => {
+  const statuses: Array<"active" | "inactive" | "pending"> = [
+    "active",
+    "inactive",
+    "pending",
+  ];
+  return Array.from({ length: count }, (_, i) => ({
+    id: `item-${i + 1}`,
+    name: `Item ${i + 1}`,
+    status: statuses[i % 3],
+    createdAt: new Date(
+      Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000,
+    ).toISOString(),
+    value: Math.floor(Math.random() * 10000),
+    metadata: {
+      category: `Category ${(i % 5) + 1}`,
+      owner: `Owner ${(i % 8) + 1}`,
+    },
+  }));
+};
+
+export const mockItems = generateMockItems(30);
+export const mockMetrics = {
+  totalCount: 150,
+  activeCount: 98,
+  completionRate: 87.5,
+  alertCount: 2,
+};
+```
+
+**Key principles:**
+
+- Generate **10–50+ records** per entity (not 1–2) so tables look realistic
+- Use **realistic domain values** (actual solar capacity ranges, dates, numbers)
+- Include **edge cases** (e.g., one panel with low efficiency to show alert)
+- Store in a single `data.ts` file for easy modification during demo
 
 ### App.tsx with React Router
 
-Set up React Router for screen navigation:
+Set up React Router for screen navigation with a **product-like layout**. Avoid forcing a left demo sidebar unless user explicitly asks for it.
 
 ```tsx
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
-// Import other pages as needed
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import SitesPage from "./pages/SitesPage";
+import { useAuth } from "./auth/useAuth";
+import AppLayout from "./layouts/AppLayout";
 
-const routes = [
-  { path: '/', label: 'Login', element: <LoginPage /> },
-  { path: '/dashboard', label: 'Dashboard', element: <DashboardPage /> },
-  // Add other routes here based on extracted screens
-];
+function ProtectedRoute({ children }: { children: JSX.Element }) {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+}
+
+function LoginRoute() {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <Navigate to="/dashboard" replace /> : <LoginPage />;
+}
 
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="flex h-screen">
-        <nav className="w-48 bg-slate-900 text-white p-4 overflow-y-auto">
-          <h2 className="text-lg font-bold mb-4">Screens</h2>
-          {routes.map((route) => (
-            <Link
-              key={route.path}
-              to={route.path}
-              className="block py-2 px-4 rounded mb-2 hover:bg-slate-700 transition"
-            >
-              {route.label}
-            </Link>
-          ))}
-        </nav>
-        <main className="flex-1 bg-white p-8 overflow-y-auto">
-          <Routes>
-            {routes.map((route) => (
-              <Route key={route.path} path={route.path} element={route.element} />
-            ))}
-          </Routes>
-        </main>
-      </div>
+      <Routes>
+        <Route path="/login" element={<LoginRoute />} />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <Routes>
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/sites" element={<SitesPage />} />
+                  {/* Add other routes here */}
+                </Routes>
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
     </BrowserRouter>
   );
 }
@@ -235,53 +333,71 @@ export default function App() {
 Create `apps/mock-ui/SCREENS.md`:
 
 ```markdown
-# Mock UI Screens — [Feature Name]
+# Product Demo Screens — [Feature Name]
 
 ## Screen Inventory
 
-| Screen | Purpose | AC Mapping | Status |
-|--------|---------|-----------|--------|
-| Login | User authentication | STORY-001 AC-001, AC-002 | ✅ Ready for review |
-| Dashboard | Main user view | STORY-001 AC-003, AC-004 | ✅ Ready for review |
-| [Screen] | [Purpose] | STORY-XXX AC-YYY | ✅ Ready for review |
+| Screen               | Purpose         | Demo Data                          | Interactive Features       | Status        |
+| -------------------- | --------------- | ---------------------------------- | -------------------------- | ------------- |
+| Dashboard            | Main overview   | 30+ items, key metrics             | Filter, search, drill-down | ✅ Demo-ready |
+| Details/Analytics    | Deep-dive view  | Full context, history, comparables | Toggle filters, export     | ✅ Demo-ready |
+| Notifications/Alerts | Status & health | Sample alerts with priority levels | Dismiss, categorize        | ✅ Demo-ready |
+| [Screen]             | [Purpose]       | [Sample data]                      | [Demo features]            | ✅ Demo-ready |
 
 ---
 
-## Screen Details
-
-### Login
-**User Story:** [Reference to docs/features/user-stories/story-XXX-...]
-**Acceptance Criteria:**
-- AC-001: User enters email and password
-- AC-002: Form validates before submission
-- AC-003: Error message shown on invalid credentials
-
-**Mockable flows:**
-- Valid login → success screen
-- Invalid credentials → error message
-- Empty fields → validation error
-
----
+## Screen Details & Demo Scenarios
 
 ### Dashboard
-**User Story:** [Reference]
-**Acceptance Criteria:**
-- AC-003: User sees dashboard after login
-- AC-004: Dashboard displays user data
-- AC-005: User can logout
 
-**Mockable flows:**
-- Load dashboard with sample data
-- Click logout → return to login
+**Product Focus:** Give customers an at-a-glance view of key metrics
+**Demo Data:**
+
+- 30+ active items/records
+- 3–5 top-level metrics (total count, active items, completion rate)
+- 2–3 sample alerts or notifications
+
+**Customer Talking Points During Demo:**
+
+1. "See all your [domain objects] tracked in real-time"
+2. "Metrics update when data changes"
+3. "Status indicators show health at a glance"
+4. "Click an item to see detailed information"
+
+**Interactive Demo Flows:**
+
+- Hover over metrics for tooltips
+- Click an item to view detailed view
+- Use filters or date range to drill down
+- Interact with alerts or notifications
 
 ---
 
-## Future Enhancements
+### Item Details / Deep Dive
 
-- [ ] Add API endpoint simulation (mock server)
-- [ ] Add form state management (Zustand, Redux)
-- [ ] Generate test scenarios per AC
-- [ ] Export as Figma/design handoff
+**Product Focus:** Deep analysis and troubleshooting
+**Demo Data:**
+
+- Complete history or timeline for one item
+- Related metadata and context
+- Comparable items or benchmarks
+- Historical actions or events
+
+**Customer Talking Points:**
+
+1. "Get detailed insights into individual items"
+2. "See what's affecting performance or status"
+3. "Compare with similar items"
+4. "Historical data helps inform decisions"
+
+---
+
+## Next Steps After Demo
+
+1. Show customer all screens live at http://localhost:5678
+2. Gather feedback on features, data displayed, workflows
+3. Iterate mock data or screens based on feedback
+4. When approved, handoff to dev team with this as UI/UX reference
 ```
 
 ---
@@ -290,10 +406,18 @@ Create `apps/mock-ui/SCREENS.md`:
 
 Generate a README for `apps/mock-ui/README.md`:
 
-```markdown
-# Mock UI — [Feature Name]
+````markdown
+# Product Demo — [Feature Name]
 
-**Purpose:** Interactive prototype for customer validation before development.
+**Purpose:** A fully interactive product demo with representative business data for customer presentations, sales, and user feedback.
+
+## Features
+
+- ✅ Complete product workflows with representative business data
+- ✅ All screens populated with 15–50+ sample records per table
+- ✅ Interactive elements: filters, searches, navigation
+- ✅ Realistic domain data with customer-ready copy (no placeholder text)
+- ✅ One-click to run, no setup required
 
 ## Quick Start
 
@@ -302,32 +426,61 @@ cd apps/mock-ui
 npm install
 npm run dev
 ```
+````
 
 Visit **http://localhost:5678** in your browser.
 
+## Demo Walkthrough
+
+### What's in the demo:
+
+1. **Dashboard** — Overview with key metrics and sample data
+2. **Details View** — Deep-dive with context and history
+3. **Notifications** — Real-time alerts and status updates
+4. **[Other screens]** — [Brief description]
+
+### How to present:
+
+1. Open the dashboard and show key metrics
+2. Click an item to drill down into details
+3. Show how to filter or change time ranges
+4. Interact with alerts or notifications
+5. Navigate between screens using the product header/tabs (or sidebar only if requested)
+
+## Customizing Demo Data
+
+Edit `src/mocks/data.ts` to change:
+
+- Number of items or records
+- Metric values and counts
+- Status distributions
+- Any domain-specific values
+
+Refresh the browser to see changes immediately.
+
 ## Structure
 
-- `src/pages/` — One screen component per user story screen
-- `src/components/` — Reusable shadcn/ui components
-- `SCREENS.md` — Maps screens to acceptance criteria
-
-## Acceptance Criteria Mapping
-
-See the generated `SCREENS.md` file for screen-to-AC mapping.
+- `src/pages/` — One screen per product feature
+- `src/components/` — Reusable UI components (shadcn/ui)
+- `src/mocks/data.ts` — All realistic sample data
+- `SCREENS.md` — Demo scenarios and talking points
+- `src/types/index.ts` — TypeScript interfaces for data models
 
 ## Next Steps
 
-1. Share with customer for feedback
-2. Iterate screens based on feedback
-3. Handoff SCREENS.md to dev team
-4. Dev team uses this as UI/UX reference during implementation
+1. Demo with customer at http://localhost:5678
+2. Gather feedback on features, UX, and data display
+3. Iterate mock data based on feedback
+4. Handoff to dev team with this as the UI/UX spec
 
 ## Tools
 
-- **Vite** — Fast dev server
+- **Vite** — Lightning-fast dev server
 - **React** — UI framework
-- **Tailwind CSS** — Utility-first styling
-- **shadcn/ui** — High-quality component library
+- **Tailwind CSS 4** — Modern styling
+- **shadcn/ui** — Professional component library
+- **React Router** — Screen navigation
+
 ```
 
 ---
@@ -338,9 +491,10 @@ See the generated `SCREENS.md` file for screen-to-AC mapping.
 
 After generation:
 1. Confirm app structure is created
-2. List generated screens
-3. If SCREENS.md was requested, confirm mapping file was created
-4. Provide the command to run: `cd apps/mock-ui && npm install && npm run dev`
+2. List **all generated screens**
+3. Include a screen inventory table in the response with: `screen name`, `route path`, and `purpose`
+4. If SCREENS.md was requested, confirm mapping file was created
+5. Provide the command to run: `cd apps/mock-ui && npm install && npm run dev`
 
 ---
 
@@ -348,25 +502,36 @@ After generation:
 
 Tell the user:
 
-> **Mock UI is ready!**
+> **Product Demo is ready for customer presentation!**
 >
-> 1. Run the app locally: `cd apps/mock-ui && npm install && npm run dev`
-> 2. Open http://localhost:5678 and test all screens
-> 3. Share the mockable flows with the customer for feedback
-> 4. When approved, this becomes the UI/UX spec for development
-> 5. See [SCREENS.md](./apps/mock-ui/SCREENS.md) for AC mapping (if generated)
+> 1. Run the demo: `cd apps/mock-ui && npm install && npm run dev`
+> 2. Open http://localhost:5678 and walk through all screens
+> 3. Use [SCREENS.md](./apps/mock-ui/SCREENS.md) for demo talking points and scripts
+> 4. Customize mock data in `src/mocks/data.ts` as needed
+> 5. Share with customer and gather feedback
+> 6. When approved, dev team uses this as the UI/UX specification
 >
-> **Next:** Run the dev server and validate with your customer.
+> **Demo Tips:**
+> - Show realistic data volumes (tables with 20+ rows)
+> - Click through workflows to show interactivity
+> - Use SCREENS.md talking points to align demo with customer goals
+> - Mention: "All data is mockable — we can adjust numbers/metrics as you request"
 
 ---
 
 ## Rules
 
-- Always generate runnable code — dev can test immediately
-- Use only shadcn/ui components; do not build custom components from scratch
-- Keep screens focused and minimal — mock, don't over-engineer
-- Map every screen to at least one AC for traceability
-- Extract screens automatically from user story AC descriptions; do not ask "which screens"
-- Use Tailwind 4 for all styling
-- Use React Router for navigation between screens
-- Initialize project with `npm create vite@latest apps/mock-ui -- --template react-ts` first
+- ✅ **Always populate screens with 15–50+ mock records** — never show empty tables or "item 1, item 2"
+- ✅ **Use realistic, domain-appropriate data** — match your actual product values and business logic
+- ✅ **Show realistic behavior with simulated delays** — add brief loading states (200-500ms) to simulate real API calls, but resolve immediately from mock data
+- ✅ **Store all mock data in `src/mocks/data.ts`** — easy to iterate during demos
+- ✅ **Use customer-ready real text** — no placeholder/filler/mock-looking UI copy in any screen
+- ✅ **Use shadcn/ui components only** — don't build custom components
+- ✅ **Style with Tailwind 4 only** — no inline CSS or custom styles
+- ✅ **Use React Router for navigation** — product-like navigation by default; sidebar only if explicitly requested
+- ✅ **Mock auth flow must work** — auth state, guarded routes, redirect logic, session persistence, and no real provider integration
+- ✅ **Include dedicated `/sites` page** — product-like site map and navigation entry must exist
+- ✅ **Include feature/AC mapping in SCREENS.md** — align demo talking points with requirements
+- ✅ **Production-ready appearance** — every screen should impress customers
+- ⚠️ Don't over-engineer — this is a demo, not a production backend
+```
